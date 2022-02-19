@@ -26,6 +26,7 @@ def parse_url(url):
     print("1: " + parsed.netloc + " " + parsed.path)
     return parsed.netloc, parsed.path
 
+
 def absolutise_url(base, relative):
     if "://" not in relative:
         # Python's URL tools somehow only work with known schemes?
@@ -70,6 +71,7 @@ def request(destination_hexhash, path):
                 timeout=5,
             )
             current_destination = destination_hash
+            return
 
         except Exception as e:
             RNS.log("Error while sending request over the link: " + str(e))
