@@ -26,7 +26,6 @@ def parse_url(url):
     path = parsed.path
     if path == "" or path == "/":
        path = "/index.gem"
-
     return parsed.netloc, path
 
 
