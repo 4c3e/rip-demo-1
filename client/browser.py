@@ -161,7 +161,7 @@ def got_response(request_receipt):
     request_id = request_receipt.request_id
     response = request_receipt.response
     responded = True
-    gemlines = response.strip().split()
+    gemlines = response.strip().split('\n')
     parse_gemtext(gemlines)
 
 def parse_gemtext(gemlines):
