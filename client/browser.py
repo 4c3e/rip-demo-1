@@ -113,6 +113,7 @@ def request(destination_hexhash, path):
 
 def browser_loop():
     global responded
+    global server_link
     reticulum = RNS.Reticulum(None)
     client_identity = RNS.Identity()
     while True:
@@ -121,6 +122,8 @@ def browser_loop():
         # Handle things other than requests
         if cmd.lower() == "q":
             print("Bye!")
+            if server_link:
+                server_link.teardown()
             break
         # Get URL, from menu, history or direct entry
         if cmd.isnumeric():
@@ -143,7 +146,6 @@ def browser_loop():
         except Exception as err:
             print(err)
             continue
-        print("appending: " + url)
         hist.append(url)
 
 
@@ -161,9 +163,9 @@ def got_response(request_receipt):
     responded = True
     gemlines = response.strip().split()
     parse_gemtext(gemlines)
-    print(str(response))
 
 def parse_gemtext(gemlines):
+    global current_destination
     preformatted = False
     if gemlines[0] == "text/gemini":
         for line in gemlines:
@@ -174,7 +176,7 @@ def parse_gemtext(gemlines):
             elif line.startswith("=>") and line[2:].strip():
                 bits = line[2:].strip().split(maxsplit=1)
                 link_url = bits[0]
-                link_url = absolutise_url(url, link_url)
+                link_url = absolutise_url(current_destination, link_url)
                 menu.append(link_url)
                 text = bits[1] if len(bits) == 2 else link_url
                 print("[%d] %s" % (len(menu), text))
