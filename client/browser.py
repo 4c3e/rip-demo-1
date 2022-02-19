@@ -169,6 +169,8 @@ def parse_gemtext(gemlines):
     preformatted = False
     if gemlines[0] == "text/gemini":
         for line in gemlines:
+            if line == gemlines[0]:
+                continue
             if line.startswith("```"):
                 preformatted = not preformatted
             elif preformatted:
