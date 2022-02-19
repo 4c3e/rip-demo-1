@@ -19,7 +19,8 @@ current_destination = None
 
 # assumes url is in this form: rip://<destinationhash>/some/optional/path
 def parse_url(url):
-    print("0: " + url)
+    if "://" not in url:
+        url = "rip://" + url
     t_url = url.replace("rip://", "http://")
     parsed = urllib.parse.urlparse(t_url)
     print("1: " + parsed.netloc + " " + parsed.path)
