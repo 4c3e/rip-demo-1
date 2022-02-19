@@ -10,10 +10,11 @@ latest_client_link = None
 
 
 def return_path(path, data, request_id, remote_identity, requested_at):
+    header = "text/gemini\n"
     with open('root/' + path, 'r') as file:
         data = file.read()
     RNS.log("Generating response to request " + RNS.prettyhexrep(request_id))
-    return data
+    return header + data
 
 
 # This initialisation is executed when the users chooses

@@ -13,9 +13,9 @@ caps = mailcap.getcaps()
 menu = []
 hist = []
 
+responded: bool = False
 server_link = None
-APP_NAME = "rip"
-
+current_destination = None
 
 def absolutise_url(base, relative):
     if "://" not in relative:
@@ -28,6 +28,11 @@ def absolutise_url(base, relative):
 
 def request(destination_hexhash, path):
     global server_link
+    global current_destination
+
+    c_path = path
+    if path == "" or path == "/":
+        c_path = "/index.gem"
 
     try:
         if len(destination_hexhash) != 20:
@@ -44,6 +49,23 @@ def request(destination_hexhash, path):
         RNS.Transport.request_path(destination_hash)
         while not RNS.Transport.has_path(destination_hash):
             time.sleep(0.1)
+
+    if current_destination == destination_hash and server_link:
+        try:
+            RNS.log("Sending request to " + c_path)
+            server_link.request(
+                c_path,
+                data=None,
+                response_callback=got_response,
+                failed_callback=request_failed,
+                timeout=5,
+            )
+            current_destination = destination_hash
+
+        except Exception as e:
+            RNS.log("Error while sending request over the link: " + str(e))
+            should_quit = True
+            server_link.teardown()
 
     # Recall the server identity
     server_identity = RNS.Identity.recall(destination_hash)
@@ -72,10 +94,6 @@ def request(destination_hexhash, path):
     while not server_link:
         time.sleep(0.1)
 
-    c_path = path
-    if path == "" or path == "/":
-        c_path = "/index.gem"
-
     try:
         RNS.log("Sending request to " + c_path)
         server_link.request(
@@ -85,6 +103,7 @@ def request(destination_hexhash, path):
             failed_callback=request_failed,
             timeout=5,
         )
+        current_destination = destination_hash
 
     except Exception as e:
         RNS.log("Error while sending request over the link: " + str(e))
@@ -129,13 +148,9 @@ def browser_loop():
 
 
 def link_established(link):
-    # We store a reference to the link
-    # instance for later use
     global server_link
     server_link = link
 
-    # Inform the user that the server is
-    # connected
     RNS.log("Link established with server")
 
 
@@ -144,7 +159,30 @@ def got_response(request_receipt):
     request_id = request_receipt.request_id
     response = request_receipt.response
     responded = True
+    gemlines = response.strip().split()
+    parse_gemtext(gemlines)
     print(str(response))
+
+def parse_gemtext(gemlines):
+    preformatted = False
+    if gemlines[0] == "text/gemini":
+        for line in gemlines:
+            if line.startswith("```"):
+                preformatted = not preformatted
+            elif preformatted:
+                print(line)
+            elif line.startswith("=>") and line[2:].strip():
+                bits = line[2:].strip().split(maxsplit=1)
+                link_url = bits[0]
+                link_url = absolutise_url(url, link_url)
+                menu.append(link_url)
+                text = bits[1] if len(bits) == 2 else link_url
+                print("[%d] %s" % (len(menu), text))
+            else:
+                print(textwrap.fill(line, 80))
+    else:
+        print("\nSorry I don't support that type of file yet\n")
+
 
 
 def request_received(request_receipt):
