@@ -136,7 +136,7 @@ def link_established(link):
 
     # Inform the user that the server is
     # connected
-    RNS.log("Link established with server, hit enter to perform a request, or type in \"quit\" to quit")
+    RNS.log("Link established with server")
 
 
 def got_response(request_receipt):
