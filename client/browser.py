@@ -23,8 +23,11 @@ def parse_url(url):
         url = "rip://" + url
     t_url = url.replace("rip://", "http://")
     parsed = urllib.parse.urlparse(t_url)
-    print("1: " + parsed.netloc + " " + parsed.path)
-    return parsed.netloc, parsed.path
+    path = parsed.path
+    if path == "" or path == "/":
+       path = "/index.gem"
+
+    return parsed.netloc, path
 
 
 def absolutise_url(base, relative):
@@ -173,9 +176,12 @@ def got_response(request_receipt):
     gemlines = response.strip().split('\n')
     parse_gemtext(gemlines)
 
+
 def parse_gemtext(gemlines):
     global current_destination
+    global menu
     preformatted = False
+    menu = []
     if gemlines[0] == "text/gemini":
         for line in gemlines:
             if line == gemlines[0]:
