@@ -1,7 +1,7 @@
 # rip-demo-1
 
 ## Host static gemtext files
-Place them in the `root` directory and they will automatically be tracked by the server, note that no subdirectories can be made yet.
+Place gemtext files in the `root` directory and they will automatically be tracked by the server, note that no subdirectories can be made yet.
 
 ```bash
 git clone https://github.com/4c3e/rip-demo-1
