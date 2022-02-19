@@ -17,6 +17,12 @@ responded: bool = False
 server_link = None
 current_destination = None
 
+# assumes url is in this form: rip://<destinationhash>/some/optional/path
+def parse_url(url):
+    t_url = url.replace("rip://", "http://")
+    parsed = urllib.parse.urlparse(t_url)
+    return parsed.netloc, parsed.path
+
 def absolutise_url(base, relative):
     if "://" not in relative:
         # Python's URL tools somehow only work with known schemes?
@@ -135,11 +141,9 @@ def browser_loop():
         else:
             url = cmd
         try:
-            url_sp = url.split(" ")
-            url_base = url_sp[0]
-            url_path = url_sp[1]
+            netloc, path = parse_url(url)
             responded = False
-            request(url_base, url_path)
+            request(netloc, path)
             while not responded:
                 time.sleep(0.1)
 
