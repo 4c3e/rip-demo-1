@@ -1,4 +1,4 @@
-# rip-demo-1
+# rrtp-demo-1
 
 ## Host static gemtext files
 Place gemtext files in the `root` directory and they will automatically be tracked by the server, note that no subdirectories can be made yet.
@@ -9,11 +9,11 @@ cd rip-demo-1
 python3 server/server.py
 ```
 
-## Connect via RIP browser
+## Connect via RRTP browser
 
 ```bash
-git clone https://github.com/4c3e/rip-demo-1
-cd rip-demo-1
+git clone https://github.com/4c3e/rrtp-demo-1
+cd rrtp-demo-1
 python3 client/browser.py
 ```
 Now enter the destination hash created when running the server for the first time.
